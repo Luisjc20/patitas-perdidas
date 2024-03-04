@@ -1,0 +1,48 @@
+/* Dashboard.css */
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+    gap: 20px;
+  }
+  
+  .card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #face7d; /* Fondo amarillo claro */
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  }
+  
+  .card img {
+    border-radius: 5px;
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .card-details {
+    margin-top: 10px;
+  }
+  
+  .pagination {
+    margin-top: 20px;
+  }
+  
+  .pagination ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+  }
+  
+  .pagination ul li {
+    cursor: pointer;
+    margin-right: 10px;
+    padding: 5px 10px;
+    background-color: #ccc;
+    border-radius: 5px;
+  }
+  
+  .pagination ul li:hover {
+    background-color: #999;
+  }
+  

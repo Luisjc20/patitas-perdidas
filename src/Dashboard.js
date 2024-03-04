@@ -18,6 +18,12 @@ import img3 from './p3.jpg';
 import EditarInfoMascota from './EditarInfoMascota'; 
 import RegistrarMascotaComoEncontrada from './RegistrarMascotaComoEncontrada';
 import ListaMascotas from './ListaMascotas';
+import imagen1 from './imagen1.jpg';
+import imagen2 from './imagen2.jpg';
+import imagen3 from './imagen3.jpg';
+import imagen4 from './imagen4.jpg';
+import imagen5 from './imagen5.jpg';
+import './Dashboard.css'
 const useStyles = makeStyles((theme) => ({
   drawer: {
     width: 250,
@@ -39,6 +45,99 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Dashboard() {
+  
+
+  const data = [
+    {
+      id: 1,
+      titulo: "Se busca perrito perdido en la Av Perú",
+      raza: "Cruzado",
+      distrito: "Comas",
+      fechaPerdida: "2024-01-15",
+      descripcion: "Perrito mediano de color marrón, con orejas largas.",
+      imagen: imagen1
+    },
+    {
+      id: 2,
+      titulo: "Perrito Golden perdido cerca del parque",
+      raza: "Golden",
+      distrito: "SMP",
+      fechaPerdida: "2024-01-20",
+      descripcion: "Perrito de tamaño grande, color dorado claro, llevaba un collar azul.",
+      imagen: imagen2
+    },
+    {
+      id: 3,
+      titulo: "Perrito Chihuahua extraviado en Los Olivos",
+      raza: "Chihuahua",
+      distrito: "Los Olivos",
+      fechaPerdida: "2024-02-05",
+      descripcion: "Chihuahua de pelaje blanco y corto, ojos grandes y cola larga.",
+      imagen: imagen3
+    },
+    {
+      id: 4,
+      titulo: "Se busca Pitbull perdido en el Cercado de Lima",
+      raza: "Pitbull",
+      distrito: "Cercado de Lima",
+      fechaPerdida: "2024-02-10",
+      descripcion: "Pitbull grande de color marrón con color blanco en la panza.",
+      imagen: imagen4
+    },
+    {
+      id: 5,
+      titulo: "Se busca Chihuahua perdido en Independencia",
+      raza: "Chihuahua",
+      distrito: "Independencia",
+      fechaPerdida: "2024-02-15",
+      descripcion: "Chihuahua de pelaje color beige, ojos grandes y cola pequeña.",
+      imagen: imagen5
+    },
+  ];
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRaza, setSelectedRaza] = useState('');
+  const [selectedFecha, setSelectedFecha] = useState('');
+  const [selectedDistrito, setSelectedDistrito] = useState('');
+  const [searchKeyword, setSearchKeyword] = useState('');
+
+  const cardsPerPage = 2;
+
+  const filteredData = data.filter(card => {
+    if (selectedRaza && card.raza !== selectedRaza) return false;
+    if (selectedFecha === 'esteAño' && new Date(card.fechaPerdida).getFullYear() !== new Date().getFullYear()) return false;
+    if (selectedFecha === 'estaSemana' && !isThisWeek(new Date(card.fechaPerdida))) return false;
+    if (selectedFecha === 'haceTresDias' && !isWithinLastNDays(new Date(card.fechaPerdida), 3)) return false;
+    if (selectedDistrito && card.distrito !== selectedDistrito) return false;
+    return true;
+  });
+
+  const isThisWeek = (date) => {
+    const today = new Date();
+    const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+    const lastDayOfWeek = new Date(today.setDate(firstDayOfWeek.getDate() + 6));
+    return date >= firstDayOfWeek && date <= lastDayOfWeek;
+  };
+
+  const isWithinLastNDays = (date, days) => {
+    const today = new Date();
+    const lastNDays = new Date(today.setDate(today.getDate() - days));
+    return date >= lastNDays && date <= new Date();
+  };
+
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCards = filteredData.slice(indexOfFirstCard, indexOfLastCard);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const handleSearch = () => {
+    // setSearchKeyword(valor_del_textfield);
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    setSearchKeyword(searchInput);
+  };
+
+  
+
   const classes = useStyles();
   const [openRegistrarMascota, setOpenRegistrarMascota] = useState(false); // Estado para controlar la apertura del modal
   const [openListaMascotas, setOpenListaMascotas] = useState(false);
@@ -63,10 +162,7 @@ function Dashboard() {
   const handleOpenEditarInfoMascota = () => {
     setOpenEditarInfoMascota(true);
   };
-  const handleSearch = () => {
-    // Lógica para la búsqueda
-    console.log('Realizar búsqueda...');
-  };
+  
   const handleEditarMascotaClick=() =>{
     window.location.href = '/EditarInfoMascota';
   }
@@ -162,19 +258,21 @@ function Dashboard() {
       </Drawer>
 
       {/* Main Content */}
-      <Container>
+       <Container>
         <br/>
         <br/>
         <br/>
         <br/>
-        <br/>
-        <div className={classes.searchContainer}>
-          {/* Componente de búsqueda con filtros */}
+
+      <div className="filter-container">
+        <div className="search-container">
           <TextField
+            id="searchInput"
             label="Buscar"
             variant="outlined"
-            className={classes.searchInput}
             style={{ width: '90%' }}
+            value={searchKeyword}
+            onChange={handleSearch}
           />
           <Button
             variant="contained"
@@ -184,108 +282,79 @@ function Dashboard() {
             Buscar
           </Button>
         </div>
-        <div className={classes.filterContainer}>
+        <br/>
+        <div className="filter-options">
           <TextField
             select
             label="Por raza"
             variant="outlined"
             style={{ width: '180px', marginRight: '15px' }}
+            value={selectedRaza}
+            onChange={(e) => setSelectedRaza(e.target.value)}
           >
+            <MenuItem value="">Todas las razas</MenuItem>
             <MenuItem value="pastorAleman">Pastor Alemán</MenuItem>
             <MenuItem value="golden">Golden</MenuItem>
             <MenuItem value="cruzado">Cruzado</MenuItem>
+            <MenuItem value="chihuahua">Chihuahua</MenuItem>
           </TextField>
-
           <TextField
             select
             label="Por fecha"
             variant="outlined"
             style={{ width: '180px', marginRight: '15px' }}
-           
+            value={selectedFecha}
+            onChange={(e) => setSelectedFecha(e.target.value)}
           >
-            <MenuItem value="esteMes">Este mes</MenuItem>
+            <MenuItem value="">Todas las fechas</MenuItem>
+            <MenuItem value="esteAño">Este año</MenuItem>
             <MenuItem value="estaSemana">Esta semana</MenuItem>
             <MenuItem value="haceTresDias">Hace tres días</MenuItem>
           </TextField>
-
           <TextField
             select
             label="Por distrito"
             variant="outlined"
             style={{ width: '180px', marginRight: '15px' }}
+            value={selectedDistrito}
+            onChange={(e) => setSelectedDistrito(e.target.value)}
           >
-            <MenuItem value="sanMiguel">San Miguel</MenuItem>
+            <MenuItem value="">Todos los distritos</MenuItem>
+            <MenuItem value="losOlivos">Los Olivos</MenuItem>
             <MenuItem value="smp">SMP</MenuItem>
             <MenuItem value="comas">Comas</MenuItem>
             <MenuItem value="independencia">Independencia</MenuItem>
           </TextField>
-
-          <MapButton />
-          
+          <MapButton/>
         </div>
-        <br/>
-        <br/>
-        {/* Cards */}
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={4}>
-            <Card className={classes.card}>
-            <CardMedia
-                component="img"
-                alt="Imagen"
-                height="300"
-                image={img1}
-                title="mascota1"
-                />
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="h2">
-                  Mascota perdida en San Miguel
-                </Typography>
-                <Typography variant="body2" color="textSecondary" component="p">
-                  Se perdió cerca al parque de las Leyendas. Se ofrece recompensa. LLamar al 99999999
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Card className={classes.card}>
-            <CardMedia
-                component="img"
-                alt="Imagen"
-                height="300"
-                image={img2}
-                title="mascota1"
-                />
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="h2">
-                  Mascota perdida en SMP
-                </Typography>
-                <Typography variant="body2" color="textSecondary" component="p">
-                  Se perdió cerca al parque de las Leyendas. Se ofrece recompensa. LLamar al 99999999
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Card className={classes.card}>
-            <CardMedia
-                component="img"
-                alt="Imagen"
-                height="300"
-                image={img3}
-                title="mascota1"
-                />
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="h2">
-                  Mascota perdida en Comas
-                </Typography>
-                <Typography variant="body2" color="textSecondary" component="p">
-                  Se perdió cerca al parque de las Leyendas. Se ofrece recompensa. LLamar al 99999999
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Container>
+      </div>
+      <br/>
+      <div className="cards-container">
+        {currentCards.map((card, index) => (
+          <div key={index} className="card">
+            <img src={card.imagen} alt={card.titulo} width="400" height="300"/>
+            <div className="card-details">
+              <h3>{card.titulo}</h3>
+              <p><strong>Raza:</strong> {card.raza}</p>
+              <p><strong>Distrito:</strong> {card.distrito}</p>
+              <p><strong>Fecha de pérdida:</strong> {card.fechaPerdida}</p>
+              <p><strong>Descripción:</strong> {card.descripcion}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="pagination">
+        {filteredData.length > cardsPerPage && (
+          <ul>
+            {Array.from({ length: Math.ceil(filteredData.length / cardsPerPage) }, (_, i) => (
+              <li key={i} onClick={() => paginate(i + 1)}>
+                {i + 1}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </Container>
 
       {/* Footer */}
       <Footer />
